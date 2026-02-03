@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 from io import BytesIO
+import pandas as pd
 
 st.title('Переводчик схем')
 st.subheader('Загрузи свою блок-схему, чтобы начать')
@@ -53,7 +54,6 @@ if st.button('Загрузить данные'):
                 )
                 
                 st.subheader("Превью CSV:")
-                import pandas as pd
                 csv_data = pd.read_csv(BytesIO(response.content))
                 st.dataframe(csv_data, use_container_width=True)
                 
