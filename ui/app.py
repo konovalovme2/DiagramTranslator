@@ -36,7 +36,7 @@ if st.button('Загрузить данные'):
     with st.spinner('Обработка схемы...'):
         try:
             response = requests.post(
-                "http://localhost:8000/api/v1/analyze",
+                "http://host.docker.internal:8000/api/v1/analyze",
                 files=files,
                 data=data,
                 timeout=30
