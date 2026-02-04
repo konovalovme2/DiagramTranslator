@@ -1,5 +1,5 @@
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import cv2
@@ -13,8 +13,8 @@ app = FastAPI(title="DiagramTranslator API")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["POST"],
+    allow_headers=["Content-Type"],
 )
 
 @app.post("/api/v1/analyze")
@@ -27,7 +27,7 @@ async def analyze_flowchart(
     
     Параметры:
     - file: изображение
-    - mode: "up-down" или "left-right"
+    - mode: "up-down", "left-right" или "snake-style"
     
     Возвращает: 
     - файл .csv для скачивания
@@ -45,24 +45,32 @@ async def analyze_flowchart(
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
         #ВОТ ТУТ ИСПОЛЬЗУЕМ НАШИ МОДЕЛИ
-        
+
+        # (пока заглушка)
+        blocks = [
+            {"id": 1, "text": "Начало"},
+            {"id": 2, "text": "i = 0"},
+            {"id": 3, "text": "i < 10?"},
+            {"id": 4, "text": "i = i + 1"},
+            {"id": 5, "text": "Конец"}
+        ]
         
         csv_buffer = io.StringIO()
         writer = csv.writer(csv_buffer)
         writer.writerow(["Шаг", "Действие"])
         
-        #ВОТ ТУТ ЗАПИСЫВАЕМ В ТАБЛИЦУ
-
-        csv_filename = f"Description_{int(time.time())}.csv"
-        with open(csv_filename, "w", encoding="utf-8") as f:
-            f.write(csv_buffer.getvalue())
+        for block in blocks:
+            writer.writerow([f"Шаг {block['id']}", block['text']])
         
-        return FileResponse(
-            path=csv_filename,
-            filename=csv_filename,
-            media_type="text/csv",
-            headers={"Content-Disposition": f"attachment; filename={csv_filename}"}
-        )
+        timestamp = int(time.time())
+        return {
+            "status": "success",
+            "data": {
+                "blocks": blocks,
+                "blocks_count": len(blocks),
+                "mode": mode
+            }
+        }
     
     except HTTPException as e:
         raise e
