@@ -1,4 +1,4 @@
-from ml_utils import bytes_to_image, detect_rect, detect_arrow, recognize_text_from_block
+from ml_utils import bytes_to_image, detect_rect, detect_arrow, recognize_text_from_block, detect_circs
 from graph_utils import match_arrows_to_blocks, distance, translate_graph
 
 def Up_Down(file_bytes):
@@ -46,6 +46,9 @@ def Left_Right(file_bytes):
         raise ValueError("Невозможно прочитать изображение")
     
     blocks = detect_rect(image)
+    blocks_circs = detect_circs(image)
+    if len(blocks_circs) > 0:
+        blocks.extend(blocks_circs)
     
     if len(blocks) == 0:
         return [{"id": 1, "text": "Блоки не обнаружены"}]
