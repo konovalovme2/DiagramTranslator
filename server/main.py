@@ -1,12 +1,10 @@
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
-from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-import cv2
-import numpy as np
 import time
 import io
 import csv
+from modes import Up_Down, Left_Right, snake_like
 
 app = FastAPI(title="DiagramTranslator API")
 
@@ -37,23 +35,17 @@ async def analyze_flowchart(
         if not file.content_type.startswith('image/'):
             raise HTTPException(400, "Файл должен быть изображением")
         
-        if mode not in ["up-down", "left-right"]:
+        if mode not in ["up-down", "left-right", "snake-like"]:
             raise HTTPException(400, "Режим должен быть 'up-down' или 'left-right'")
         
-        contents = await file.read()
-        nparr = np.frombuffer(contents, np.uint8)
-        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        file_bytes = await file.read()
         
-        #ВОТ ТУТ ИСПОЛЬЗУЕМ НАШИ МОДЕЛИ
-
-        # (пока заглушка)
-        blocks = [
-            {"id": 1, "text": "Начало"},
-            {"id": 2, "text": "i = 0"},
-            {"id": 3, "text": "i < 10?"},
-            {"id": 4, "text": "i = i + 1"},
-            {"id": 5, "text": "Конец"}
-        ]
+        if mode == "up-down":
+            blocks = Up_Down(file_bytes)
+        elif mode == "left-right":
+            blocks = Left_Right(file_bytes)
+        else:
+            blocks = snake_like(file_bytes)
         
         csv_buffer = io.StringIO()
         writer = csv.writer(csv_buffer)
