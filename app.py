@@ -1,6 +1,6 @@
 import streamlit as st
 import requests
-from io import BytesIO, StringIO
+from io import StringIO
 import pandas as pd
 
 st.title('Переводчик схем')
@@ -10,7 +10,7 @@ with st.sidebar:
     st.title ('Настройки')
 
     mode_name = st.selectbox('Выберите как расположена схема',
-                        ['Сверху вниз', 'Слева направо'],
+                        ['Сверху вниз', 'Слева направо', 'Змейка'],
                         placeholder="Выберите вариант..." )
     
     file = st.file_uploader('Загрузи блок-схему в формате png', type='png')
@@ -22,8 +22,10 @@ if st.button('Загрузить данные'):
     
     if mode_name == 'Сверху вниз':
         mode = 'up-down'
-    else:
+    elif mode_name == 'Слева направо':
         mode = 'left-right'
+    else:
+        mode = 'snake-like'
 
     files = {
             'file': (file.name, file.getvalue(), 'image/png')
