@@ -137,49 +137,12 @@ def detect_arrow(image):
     for r in results:
         if r.boxes is not None and len(r.boxes.xyxy) > 0:
             for box in r.boxes.xyxy.cpu().numpy():
+
                 x1, y1, x2, y2 = map(int, box)
-                
-                cropped = image[y1:y2, x1:x2]
-                if cropped.size == 0:
-                    continue
-                
-                gray = cv2.cvtColor(cropped, cv2.COLOR_BGR2GRAY)
-                _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-                contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-                
-                arrowhead_side = None
-                for cnt in contours:
-                    epsilon = 0.04 * cv2.arcLength(cnt, True)
-                    approx = cv2.approxPolyDP(cnt, epsilon, True)
-                 
-                    if len(approx) == 3:
-                        moments = cv2.moments(cnt)
-                        if moments["m00"] != 0:
-                            cx_local = int(moments["m10"] / moments["m00"])
-                            if cx_local < cropped.shape[1] * 0.4:
-                                arrowhead_side = "left"
-                            elif cx_local > cropped.shape[1] * 0.6:
-                                arrowhead_side = "right"
-                            else:
-                                arrowhead_side = "center"
-                        break
-                
                 cx, cy = (x1 + x2) / 2, (y1 + y2) / 2
-                
-                if arrowhead_side == "right" or arrowhead_side is None:
-                    start = (x1, cy)
-                    end = (x2, cy)
-                elif arrowhead_side == "left":
-                    start = (x2, cy)
-                    end = (x1, cy)
-                else:
-                    start = (cx, y1)
-                    end = (cx, y2)
-                
+
                 arrows.append({
                     "bbox": (x1, y1, x2, y2),
-                    "start": (float(start[0]), float(start[1])),
-                    "end": (float(end[0]), float(end[1])),
                     "center": (cx, cy)
                 })
     
