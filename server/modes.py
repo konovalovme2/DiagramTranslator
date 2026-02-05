@@ -78,24 +78,41 @@ def Left_Right(file_bytes):
     return [{"id": i+1, "text": text} for i, text in enumerate(formatted)]
 
 def snake_like(file_bytes):
-    """Обход схемы и построение графа"""
     image = bytes_to_image(file_bytes)
-    if image is None:
-        raise ValueError("Невозможно прочитать изображение")
-    
     blocks = detect_rect(image)
     arrows = detect_arrow(image)
-    if len(blocks) == 0:
+    
+    if not blocks:
         return [{"id": -1, "text": "Блоки не обнаружены"}]
-    elif len(arrows) == 0:
+    if not arrows:
         return [{"id": -1, "text": "Стрелки не обнаружены"}]
     
-    graph = match_arrows_to_blocks(blocks, arrows)
-    start_idx = min(
-        range(len(blocks)),
-        key=lambda i: (blocks[i]["center"][1], blocks[i]["center"][0])
-    )
-
-    result = translate_graph(graph, blocks, start_idx)
+    current_idx = min(range(len(blocks)), key=lambda i: (blocks[i]["center"][1], blocks[i]["center"][0]))
+    result = [recognize_text_from_block(blocks[current_idx]["cropped"])]
+    visited = {current_idx}
     
-    return [{"id": i+1, "text": line} for i, line in enumerate(result)]
+    for _ in range(len(blocks) - 1):
+        arrow_idx = min(
+            range(len(arrows)),
+            key=lambda i: distance(blocks[current_idx]["center"], arrows[i]["center"])
+        )
+        arrow_center = arrows[arrow_idx]["center"]
+
+        next_idx = None
+        min_dist = float('inf')
+        for i, block in enumerate(blocks):
+            if i in visited:
+                continue
+            dist = distance(arrow_center, block["center"])
+            if dist < min_dist:
+                min_dist = dist
+                next_idx = i
+        
+        if next_idx is None:
+            break
+        
+        visited.add(next_idx)
+        result.append(recognize_text_from_block(blocks[next_idx]["cropped"]))
+        current_idx = next_idx
+    
+    return [{"id": i+1, "text": text} for i, text in enumerate(result)]
