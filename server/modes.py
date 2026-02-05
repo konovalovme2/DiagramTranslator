@@ -35,7 +35,7 @@ def Up_Down(file_bytes):
             formatted.append(text)
         else:
             step += 1
-            formatted.append([step, text])
+            formatted.append(f"{step}. {text}")
     
     return [{"id": i+1, "text": text} for i, text in enumerate(formatted)]
 
