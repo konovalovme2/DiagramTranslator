@@ -15,7 +15,7 @@ with st.sidebar:
     
     file = st.file_uploader('Загрузи блок-схему в формате png', type='png')
 
-if st.button('Загрузить данные'):
+if st.button('Начать работу'):
     if file is None:
         st.error('Файл не загружен!')
         st.stop()
