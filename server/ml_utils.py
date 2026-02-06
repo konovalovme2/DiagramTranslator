@@ -4,10 +4,10 @@ import cv2
 import numpy as np
 
 reader = easyocr.Reader(['ru', 'en'], gpu=False)
-yolo_rects = YOLO(r'C:\Users\user\PycharmProjects\DiagramTranlator\server\yolo-models\rects.onnx')
-yolo_arrows = YOLO(r'C:\Users\user\PycharmProjects\DiagramTranlator\server\yolo-models\arrows.onnx')
-yolo_circs = YOLO(r'C:\Users\user\PycharmProjects\DiagramTranlator\server\yolo-models\circs.onnx')
-yolo_gates = YOLO(r'C:\Users\user\PycharmProjects\DiagramTranlator\server\yolo-models\gates.onnx')
+yolo_rects = YOLO(r'./server/yolo-models/rects.onnx')
+yolo_arrows = YOLO(r'./server/yolo-models/arrows.onnx')
+yolo_circs = YOLO(r'./server/yolo-models/circs.onnx')
+yolo_gates = YOLO(r'./server/yolo-models/gates.onnx')
 
 def bytes_to_image(file_bytes):
     """Конвертирует байты в изображение"""
