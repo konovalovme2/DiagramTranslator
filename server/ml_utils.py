@@ -130,7 +130,7 @@ def detect_arrow(image):
     
     results = yolo_arrows.predict(
         source=image,
-        conf=0.5,
+        conf=0.1,
         device='cpu',
         verbose=False
     )
